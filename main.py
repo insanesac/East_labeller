@@ -10,11 +10,13 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from tkinter import Button, Canvas, NW, messagebox
 import cv2, os
-import numpy as np
 
 direc = r'/home/insanesac/Desktop/tags/'
 files = os.listdir(direc)
 files = [x for x in files if 'txt' not in x]
+path0 = direc+files[0]
+
+r,c = 700,300
 i=0
 
 def tagImage():
@@ -23,9 +25,14 @@ def tagImage():
 def validImage():
     global direc, files, i
     path = direc+files[i]
-    cropped = validator(path)
-    print(len(cropped))
-
+    cropped,label = validator(path)
+    
+    crop1 = cropped[0]
+    w = tk.Tk()
+    r_c,c_c = crop1.shape[:2]
+    crp_img = ImageTk.PhotoImage(Image.fromarray(crop1))
+    
+    
 def validator(imgp):
     cropped = []
     val_img_path = imgp
@@ -39,10 +46,9 @@ def validator(imgp):
     for i,line in enumerate(lines):
         split_line = line.split(',')
         y1,x1,y2,x2,y3,x3,y4,x4,label = split_line[:9]
-#        cv2.rectangle(img,(int(x1),int(y1)),(int(x3),int(y3)),(0,200,0),3)
                 
         cropped.append(val_img[int(x1):int(x3),int(y1):int(y3)])    
-    return cropped
+    return cropped, label
     
 def nextButton():
     global files, i
@@ -80,10 +86,8 @@ def update_image():
         pil_img = Image.open(path)
         tkimg1 = ImageTk.PhotoImage(resize_img(pil_img))
         canvas.itemconfig(area, image = tkimg1)
-        
+
 w = tk.Tk()
-path0 = direc+files[0]
-r,c = 700,300
 img = ImageTk.PhotoImage(resize_img(Image.open(path0)))  
 canvas = Canvas(w, width = c+500, height = r+50)  
 area = canvas.create_image(20, 20, anchor=NW, image=img) 
