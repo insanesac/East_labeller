@@ -19,9 +19,8 @@ def nextButton():
     global i,files,direc
     i+=1
     if i >= len(files):
-        msg = messagebox.showinfo('ERROR','No Next Image')
+        messagebox.showinfo('ERROR','No Next Image')
         i-=1
-#        w.destroy()
     else:
         w.after(10,update_image)
 
@@ -29,7 +28,7 @@ def prevButton():
     global i,files,direc
     i-=1
     if i < 0:
-        msg = messagebox.showinfo('ERROR','No Previous Image')
+        messagebox.showinfo('ERROR','No Previous Image')
         i+=1
     else:
         w.after(10,update_image)
@@ -39,8 +38,7 @@ def update_image():
         path = direc + files[i]
         tkimg1 = ImageTk.PhotoImage(Image.open(path))
         canvas.itemconfig(area, image = tkimg1)
-        canvas.after(1000, update_image)
- 
+        
 w = tk.Tk()
 path0 = direc+files[0]
 img = ImageTk.PhotoImage(Image.open(path0))  
