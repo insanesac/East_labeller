@@ -24,12 +24,17 @@ def tagImage():
     print('Calling East')
 
 def validImage():
-    global direc, files, i, innercanvas, area, cropped, crop1, crp_img, label_list
+    global direc, files, i, innercanvas, area, cropped, crop1, crp_img, label_list, cnt, canvas, new_img
     path = direc+files[i]
-    cropped,label_list = validator(path)
     
     B5 = Button(w, text='Next', command=nextCropButton).place(x =  c + 500, y = r/2 - 50)
     B6 = Button(w, text='Prev', command=prevCropButton).place(x =  c + 590, y = r/2 - 50) 
+    
+    cropped,label_list, cnt = validator(path)
+    
+    new_img = ImageTk.PhotoImage(resize_img(Image.fromarray(cnt[0])))
+    canvas.itemconfig(area, image = new_img)
+    
     crop1 = cropped[0]
     crp_img = ImageTk.PhotoImage(Image.fromarray(crop1))
     innercanvas.itemconfig(area, image = crp_img)
@@ -39,27 +44,43 @@ def validImage():
     entry.place(x = 850,y=200)
     
 def validator(imgp):
-    global canvas
+    global canvas, val_img, imgn
     cropped = []
+    cnt = []
     label_list = []
+    
+    val_img = None
     val_img_path = imgp
     val_base = val_img_path.split('.')[0]
     val_txt = val_base + '.txt'
     val_img = cv2.imread(val_img_path)
+    
     with open(val_txt,'r') as t:
         lines = t.readlines()
+        
     for i,line in enumerate(lines):
+        imgn = val_img.copy()
         split_line = line.split(',')
         y1,x1,y2,x2,y3,x3,y4,x4,label = split_line[:9]
-                
-        cropped.append(val_img[int(x1)-2:int(x3)+2,int(y1)-2:int(y3)+2]) 
-        label_list.append(label)
         
-    return cropped, label_list
+        sub1 = abs(int(y1) - int(y3))
+        sub2 = abs(int(x1) - int(x3)) 
+        
+        if sub1 > sub2:        
+            cnt.append(cv2.rectangle(imgn,(int(y1),int(x1)),(int(y3),int(x3)),(0,200,0),3))
+            cropped.append(val_img[int(x1)-2:int(x3)+2,int(y1)-2:int(y3)+2])
+        else:
+            cnt.append(cv2.rectangle(imgn,(int(x1),int(y1)),(int(x3),int(y3)),(0,200,0),3))
+            cropped.append(val_img[int(y1)-2:int(y3)+2,int(x1)-2:int(x3)+2])    
+         
+        label_list.append(label)
+
+    return cropped, label_list, cnt
     
 def nextButton():
-    global files, i
+    global files, i, j
     i+=1
+    j = 0
     if i >= len(files):
         messagebox.showinfo('ERROR','No Next Image')
         i-=1
@@ -67,8 +88,9 @@ def nextButton():
         w.after(10,update_image)
 
 def prevButton():
-    global files, i
+    global files, i, j 
     i-=1
+    j = 0
     if i < 0:
         messagebox.showinfo('ERROR','No Previous Image')
         i+=1
@@ -113,12 +135,15 @@ def update_image():
         canvas.itemconfig(area, image = tkimg1)
 
 def update_crop():
-        global cropped, crop1, crp_img, area,innercanvas,label_list,innercanvas1
+        global cropped, crop1, crp_img, area,innercanvas,label_list,innercanvas1,tkimg2, canvas, area, cnt, current_img
         crop1 = cropped[j]
         crp_img = ImageTk.PhotoImage(Image.fromarray(crop1))
         innercanvas.itemconfig(area, image = crp_img)
         label1 = label_list[j]
         innercanvas1.itemconfig(area, text = label1)
+        current_img = cnt[j]
+        tkimg2 = ImageTk.PhotoImage(resize_img(Image.fromarray(current_img)))
+        canvas.itemconfig(area, image = tkimg2)
         
     
         
