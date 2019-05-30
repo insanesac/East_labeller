@@ -213,7 +213,7 @@ innercanvas1.place()
 
 
 
-B0 = Button(w, text='Tagger', command=tagImage).place(x =  c + 120, y = 20 )
+B0 = Button(w, text='Tagger - WiP', command=tagImage).place(x =  c + 120, y = 20 )
 B1 = Button(w, text='Validator', command=validImage).place(x =  c + 320, y = 20 )
 B2 = Button(w, text='Next', command=nextButton).place(x =  c + 290, y = r )
 B3 = Button(w, text='Prev', command=prevButton).place(x =  c + 205, y = r ) 
