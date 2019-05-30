@@ -20,36 +20,48 @@ path0 = direc+files[0]
 r,c = 700,300
 i = 0
 j = 1
-
+state = 0
 
 def tagImage():
     print('Calling East')
 
 def fix_entry():
-    global val_txt, j, y1,x1,y2,x2,y3,x3,y4,x4, new_text 
+    global val_txt, j, cordinates, new_text, state
+    if state == 0:
+        j-=1
     with open(val_txt,'r') as t1:
         lines_fix = t1.readlines()
-        
-    ordered_text = [y1,x1,y2,x2,y3,x3,y4,x4,new_text]
+    print(j)
+    print(cordinates[j])
+    yn1,xn1,yn2,xn2,yn3,xn3,yn4,xn4 = cordinates[j].split(',')
+    ordered_text = [yn1,xn1,yn2,xn2,yn3,xn3,yn4,xn4,new_text+'\n']
+    ordered_text = ",".join(ordered_text)
     lines_fix[j]  = ordered_text
+    
+    os.remove(val_txt)
     
     with open(val_txt,'w') as t2:
         for lf in lines_fix:
-            t2.write("%s\n"%lf)
+            print(type(lf))
+            print(lf)
+            t2.write("%s"%lf)
+            
+    print('Over Written')
             
 def getData():
     global entry, new_text
     new_text = None
     new_text = entry.get()
+    fix_entry()
     
 def validImage():
-    global direc, files, i, innercanvas, area, cropped, crop1, crp_img, label_list, cnt, canvas, new_img, new_text, entry
+    global direc, files, i, innercanvas, area, cropped, crop1, crp_img, label_list, cnt, canvas, new_img, new_text, entry, cordinates
     path = direc+files[i]
     
     B5 = Button(w, text='Next', command=nextCropButton).place(x =  c + 590, y = r/2 - 50)
     B6 = Button(w, text='Prev', command=prevCropButton).place(x =  c + 500, y = r/2 - 50) 
     
-    cropped,label_list, cnt = validator(path)
+    cropped,label_list, cnt,cordinates = validator(path)
     
     new_img = ImageTk.PhotoImage(resize_img(Image.fromarray(cnt[0])))
     canvas.itemconfig(area, image = new_img)
@@ -64,13 +76,14 @@ def validImage():
     
     B7 = Button(w, text ="Submit", command = getData).place(x =  c + 680, y = r/2 - 50)
     
-    fix_entry() 
+     
     
 def validator(imgp):
-    global canvas, val_img, imgn, val_txt,y1,x1,y2,x2,y3,x3,y4,x4
+    global canvas, val_img, imgn, val_txt,cordinates
     cropped = []
     cnt = []
     label_list = []
+    cordinates = []
     
     val_img = None
     val_img_path = imgp
@@ -92,13 +105,16 @@ def validator(imgp):
         if sub1 > sub2:        
             cnt.append(cv2.rectangle(imgn,(int(y1),int(x1)),(int(y3),int(x3)),(0,200,0),3))
             cropped.append(val_img[int(x1)-2:int(x3)+2,int(y1)-2:int(y3)+2])
+            cord = [y1,x1,y2,x2,y3,x3,y4,x4]
         else:
             cnt.append(cv2.rectangle(imgn,(int(x1),int(y1)),(int(x3),int(y3)),(0,200,0),3))
-            cropped.append(val_img[int(y1)-2:int(y3)+2,int(x1)-2:int(x3)+2])    
+            cropped.append(val_img[int(y1)-2:int(y3)+2,int(x1)-2:int(x3)+2]) 
+            cord = [x1,y1,x2,y2,x3,y3,x4,y4]
          
+        cordinates.append(",".join(cord))
         label_list.append(label)
 
-    return cropped, label_list, cnt
+    return cropped, label_list, cnt,cordinates
     
 def nextButton():
     global files, i, j
@@ -121,13 +137,15 @@ def prevButton():
         w.after(10,update_image)
 
 def nextCropButton():
-    global j,cropped
+    global j,cropped, state
     j+=1
+    state = 0
     if j >= len(cropped):
         messagebox.showinfo('ERROR','No new cropped ROI')
         j-=1
     else:
         w.after(10,update_crop)
+        state = 1
 
 def prevCropButton():
     global j,cropped
