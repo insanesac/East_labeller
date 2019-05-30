@@ -20,15 +20,34 @@ path0 = direc+files[0]
 r,c = 700,300
 i = 0
 j = 1
+
+
 def tagImage():
     print('Calling East')
 
+def fix_entry():
+    global val_txt, j, y1,x1,y2,x2,y3,x3,y4,x4, new_text 
+    with open(val_txt,'r') as t1:
+        lines_fix = t1.readlines()
+        
+    ordered_text = [y1,x1,y2,x2,y3,x3,y4,x4,new_text]
+    lines_fix[j]  = ordered_text
+    
+    with open(val_txt,'w') as t2:
+        for lf in lines_fix:
+            t2.write("%s\n"%lf)
+            
+def getData():
+    global entry, new_text
+    new_text = None
+    new_text = entry.get()
+    
 def validImage():
-    global direc, files, i, innercanvas, area, cropped, crop1, crp_img, label_list, cnt, canvas, new_img
+    global direc, files, i, innercanvas, area, cropped, crop1, crp_img, label_list, cnt, canvas, new_img, new_text, entry
     path = direc+files[i]
     
-    B5 = Button(w, text='Next', command=nextCropButton).place(x =  c + 500, y = r/2 - 50)
-    B6 = Button(w, text='Prev', command=prevCropButton).place(x =  c + 590, y = r/2 - 50) 
+    B5 = Button(w, text='Next', command=nextCropButton).place(x =  c + 590, y = r/2 - 50)
+    B6 = Button(w, text='Prev', command=prevCropButton).place(x =  c + 500, y = r/2 - 50) 
     
     cropped,label_list, cnt = validator(path)
     
@@ -43,8 +62,12 @@ def validImage():
     entry = Entry(w,bd=5)
     entry.place(x = 850,y=200)
     
+    B7 = Button(w, text ="Submit", command = getData).place(x =  c + 680, y = r/2 - 50)
+    
+    fix_entry() 
+    
 def validator(imgp):
-    global canvas, val_img, imgn
+    global canvas, val_img, imgn, val_txt,y1,x1,y2,x2,y3,x3,y4,x4
     cropped = []
     cnt = []
     label_list = []
