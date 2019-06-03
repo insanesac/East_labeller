@@ -7,23 +7,64 @@ Created on Tue May 28 14:40:08 2019
 """
 
 import tkinter as tk
-from PIL import Image, ImageTk
-from tkinter import Button, Canvas, NW, messagebox, Frame, Entry, Label
+from tkinter import * #Button, Canvas, NW, messagebox, Frame, Entry, Label
 import cv2, os
 import numpy as np
+from PIL import Image, ImageTk
 
 direc = r'/home/insanesac/Desktop/tags/'
 files = os.listdir(direc)
 files = [x for x in files if 'txt' not in x]
-path0 = direc+files[0]
+path0 = os.path.join(direc,files[0])
 
 r,c = 700,300
 i = 0
 j = 1
 state = 0
+count = 0
+right_click_number = 0
+left_click_number = 0
+x1,y1 = [],[]
 
-def tagImage():
+def draw_line(event):
+    global right_click_number, left_click_count, count
+    global x1,y1
+    global canvas_id
+    right_click_number+=1
+    x1.append(event.x)
+    y1.append(event.y)
+    print(x1)
+    print(y1)
+    
+    if right_click_number == 4:
+        print(1)
+    
+def autoTrain():
     print('Calling East')
+
+def manualTrain():
+    canvas.bind('<Button-1>',draw_line)
+    print('loading annotator')
+
+def dispButton():
+#    global B0,B1,B8,B9, B10
+    B0.place(x =  c + 120, y = 20 )
+    B1.place(x =  c + 320, y = 20 )
+    B8.place_forget()
+    B9.place_forget()
+    B10.place_forget()
+    
+def tagImage():
+    global B0,B1,B8,B9, B10
+    B0.place_forget()
+    B1.place_forget()
+    B8 = Button(w, text='Auto', command=autoTrain)
+    B8.place(x =  c + 120, y = 20 )
+    B9 = Button(w, text='Manual', command=manualTrain)
+    B9.place(x =  c + 220, y = 20) 
+    B10 = Button(w, text='Back', command=dispButton)
+    B10.place(x =  c + 320, y = 20) 
+    
 
 def fix_entry():
     global val_txt, j, cordinates, new_text, state
@@ -55,11 +96,17 @@ def getData():
     fix_entry()
     
 def validImage():
-    global direc, files, i, innercanvas, area, cropped, crop1, crp_img, label_list, cnt, canvas, new_img, new_text, entry, cordinates
-    path = direc+files[i]
+    global direc, files, i, innercanvas, area, cropped, crop1, crp_img, label_list
+    global cnt, canvas, new_img, new_text, entry, cordinates
+#    global B0,B1
+#    B0.place_forget()
+#    B1.place_forget()
+    path = os.path.join(direc,files[i])
     
-    B5 = Button(w, text='Next', command=nextCropButton).place(x =  c + 590, y = r/2 - 50)
-    B6 = Button(w, text='Prev', command=prevCropButton).place(x =  c + 500, y = r/2 - 50) 
+    B5 = Button(w, text='Next', command=nextCropButton)
+    B5.place(x =  c + 590, y = r/2 - 50)
+    B6 = Button(w, text='Prev', command=prevCropButton)
+    B6.place(x =  c + 500, y = r/2 - 50) 
     
     cropped,label_list, cnt,cordinates = validator(path)
     
@@ -74,7 +121,8 @@ def validImage():
     entry = Entry(w,bd=5)
     entry.place(x = 850,y=200)
     
-    B7 = Button(w, text ="Submit", command = getData).place(x =  c + 680, y = r/2 - 50)
+    B7 = Button(w, text ="Submit", command = getData)
+    B7.place(x =  c + 680, y = r/2 - 50)
     
      
     
@@ -169,22 +217,23 @@ def resize_img(pil_img):
         return pil_img
     
 def update_image():
-        global tkimg1, canvas, area, direc, files, i
-        path = direc + files[i]
-        pil_img = Image.open(path)
-        tkimg1 = ImageTk.PhotoImage(resize_img(pil_img))
-        canvas.itemconfig(area, image = tkimg1)
+    global tkimg1, canvas, area, direc, files, i
+    path = os.path.join(direc, files[i])
+    pil_img = Image.open(path)
+    tkimg1 = ImageTk.PhotoImage(resize_img(pil_img))
+    canvas.itemconfig(area, image = tkimg1)
 
 def update_crop():
-        global cropped, crop1, crp_img, area,innercanvas,label_list,innercanvas1,tkimg2, canvas, area, cnt, current_img
-        crop1 = cropped[j]
-        crp_img = ImageTk.PhotoImage(Image.fromarray(crop1))
-        innercanvas.itemconfig(area, image = crp_img)
-        label1 = label_list[j]
-        innercanvas1.itemconfig(area, text = label1)
-        current_img = cnt[j]
-        tkimg2 = ImageTk.PhotoImage(resize_img(Image.fromarray(current_img)))
-        canvas.itemconfig(area, image = tkimg2)
+    global cropped, crop1, crp_img, area,innercanvas,label_list,innercanvas1
+    global tkimg2, canvas, area, cnt, current_img
+    crop1 = cropped[j]
+    crp_img = ImageTk.PhotoImage(Image.fromarray(crop1))
+    innercanvas.itemconfig(area, image = crp_img)
+    label1 = label_list[j]
+    innercanvas1.itemconfig(area, text = label1)
+    current_img = cnt[j]
+    tkimg2 = ImageTk.PhotoImage(resize_img(Image.fromarray(current_img)))
+    canvas.itemconfig(area, image = tkimg2)
         
     
         
@@ -192,10 +241,10 @@ w = tk.Tk()
 img = ImageTk.PhotoImage(resize_img(Image.open(path0)))  
 #frame = Frame(w, ,width = 700, height = 250, bd = 1)
 #frame.pack()
-name = Label(w, text = "Name").place(x = 600,y = 150)  
-canvas = Canvas(w, width = c+800, height = r+50)  
+w.geometry('900x900')
+canvas = Canvas(w, width = c, height = r)  
 area = canvas.create_image(20, 20, anchor=NW, image=img) 
-canvas.pack()
+canvas.pack(side=LEFT)
 crop = cv2.imread(path0)[:60,:300,:]
 crop[crop != 217] = 0
 r_c,c_c = crop.shape[:2]
@@ -213,11 +262,16 @@ innercanvas1.place()
 
 
 
-B0 = Button(w, text='Tagger - WiP', command=tagImage).place(x =  c + 120, y = 20 )
-B1 = Button(w, text='Validator', command=validImage).place(x =  c + 320, y = 20 )
-B2 = Button(w, text='Next', command=nextButton).place(x =  c + 290, y = r )
-B3 = Button(w, text='Prev', command=prevButton).place(x =  c + 205, y = r ) 
-B4 = Button(w, text="Quit", command=w.destroy).place(x =  c + 380, y = r )
+B0 = Button(w, text='Tagger - WiP', command=tagImage)
+B0.place(x =  c + 120, y = 20 )
+B1 = Button(w, text='Validator', command=validImage)
+B1.place(x =  c + 320, y = 20 )
+B2 = Button(w, text='Next', command=nextButton)
+B2.place(x =  c + 290, y = r )
+B3 = Button(w, text='Prev', command=prevButton)
+B3.place(x =  c + 205, y = r ) 
+B4 = Button(w, text="Quit", command=w.destroy)
+B4.place(x =  c + 380, y = r )
 
 
 
