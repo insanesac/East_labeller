@@ -7,7 +7,7 @@ Created on Tue May 28 14:40:08 2019
 """
 
 import tkinter as tk
-from tkinter import * #Button, Canvas, NW, messagebox, Frame, Entry, Label
+from tkinter import Button, Canvas, NW, messagebox, Entry, LEFT
 import cv2, os
 import numpy as np
 from PIL import Image, ImageTk
@@ -104,9 +104,9 @@ def validImage():
     path = os.path.join(direc,files[i])
     
     B5 = Button(w, text='Next', command=nextCropButton)
-    B5.place(x =  c + 590, y = r/2 - 50)
+    B5.place(x =  c + 390, y = r/2 - 50)
     B6 = Button(w, text='Prev', command=prevCropButton)
-    B6.place(x =  c + 500, y = r/2 - 50) 
+    B6.place(x =  c + 300, y = r/2 - 50) 
     
     cropped,label_list, cnt,cordinates = validator(path)
     
@@ -119,7 +119,7 @@ def validImage():
     label1 = label_list[0]
     innercanvas1.itemconfig(area, text = label1)
     entry = Entry(w,bd=5)
-    entry.place(x = 850,y=200)
+    entry.place(x = 650,y=200)
     
     B7 = Button(w, text ="Submit", command = getData)
     B7.place(x =  c + 680, y = r/2 - 50)
@@ -253,12 +253,12 @@ crop = ImageTk.PhotoImage(resize_img(Image.fromarray(crop)))
 innercanvas = Canvas(w, width=c_c, height=r_c)
 canvas.create_window(350, 200, anchor=NW, window=innercanvas)
 innerarea = innercanvas.create_image(0,0, anchor=NW)
-innercanvas.place()
+innercanvas.pack(side = LEFT)
 
 innercanvas1 = Canvas(w, width=c_c, height=r_c)
 canvas.create_window(650, 200, anchor=NW, window=innercanvas1)
 innerarea1 = innercanvas1.create_text(0,0, anchor=NW)
-innercanvas1.place()
+innercanvas1.pack(side = LEFT)
 
 
 
