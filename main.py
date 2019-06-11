@@ -12,7 +12,8 @@ import cv2, os
 import numpy as np
 from PIL import Image, ImageTk
 
-direc = r'/home/insanesac/Desktop/tags/'
+direc =  r'/home/insanesac/Desktop/extra'  
+
 files = os.listdir(direc)
 files = [x for x in files if 'txt' not in x]
 path0 = os.path.join(direc,files[0])
@@ -33,11 +34,11 @@ def draw_line(event):
     right_click_number+=1
     x1.append(event.x)
     y1.append(event.y)
-    print(x1)
-    print(y1)
+#    print(x1)
+#    print(y1)
     
-    if right_click_number == 4:
-        print(1)
+#    if right_click_number == 4:
+#        print(1)
     
 def autoTrain():
     print('Calling East')
@@ -72,8 +73,8 @@ def fix_entry():
         j-=1
     with open(val_txt,'r') as t1:
         lines_fix = t1.readlines()
-    print(j)
-    print(cordinates[j])
+#    print(j)
+#    print(cordinates[j])
     yn1,xn1,yn2,xn2,yn3,xn3,yn4,xn4 = cordinates[j].split(',')
     ordered_text = [yn1,xn1,yn2,xn2,yn3,xn3,yn4,xn4,new_text+'\n']
     ordered_text = ",".join(ordered_text)
@@ -83,8 +84,8 @@ def fix_entry():
     
     with open(val_txt,'w') as t2:
         for lf in lines_fix:
-            print(type(lf))
-            print(lf)
+#            print(type(lf))
+#            print(lf)
             t2.write("%s"%lf)
             
     print('Over Written')
@@ -96,23 +97,42 @@ def getData():
     fix_entry()
     
 def validImage():
-    global direc, files, i, innercanvas, area, cropped, crop1, crp_img, label_list
+    global direc, files, i, innercanvas, area, cropped, crop1, crp_img, label_list, path_new
     global cnt, canvas, new_img, new_text, entry, cordinates
-#    global B0,B1
-#    B0.place_forget()
-#    B1.place_forget()
-    path = os.path.join(direc,files[i])
+    global B0,B1,B2,B3, B4
+    path_new = ''
+    B2.place_forget()
+    B3.place_forget()
+    B4.place_forget()
+
+    if not path_new:
+        path = os.path.join(direc,files[i])
+
+    B11 = Button(w, text='Next', command=nextImg)
+    B11.place(x =  c + 290, y = r )
+    B12 = Button(w, text='Prev', command=prevImg)
+    B12.place(x =  c + 205, y = r ) 
+    B13 = Button(w, text="Quit", command=w.destroy)
+    B13.place(x =  c + 380, y = r )
+
+    if path_new:
+        cropped,label_list, cnt,cordinates = validator(path_new)
+        path = path_new
+        path_new = ''
+    else:
+        cropped,label_list, cnt,cordinates = validator(path)
     
     B5 = Button(w, text='Next', command=nextCropButton)
     B5.place(x =  c + 390, y = r/2 - 50)
     B6 = Button(w, text='Prev', command=prevCropButton)
     B6.place(x =  c + 300, y = r/2 - 50) 
     
-    cropped,label_list, cnt,cordinates = validator(path)
+    cv2.imshow('cnt',cnt[0])
+    cv2.waitKey()
+    cv2.destroyAllWindows()
     
-    new_img = ImageTk.PhotoImage(resize_img(Image.fromarray(cnt[0])))
-    canvas.itemconfig(area, image = new_img)
-    
+    canvas.itemconfig(area)
+        
     crop1 = cropped[0]
     crp_img = ImageTk.PhotoImage(Image.fromarray(crop1))
     innercanvas.itemconfig(area, image = crp_img)
@@ -120,10 +140,10 @@ def validImage():
     innercanvas1.itemconfig(area, text = label1)
     entry = Entry(w,bd=5)
     entry.place(x = 650,y=200)
-    
+        
     B7 = Button(w, text ="Submit", command = getData)
     B7.place(x =  c + 680, y = r/2 - 50)
-    
+        
      
     
 def validator(imgp):
@@ -147,17 +167,17 @@ def validator(imgp):
         split_line = line.split(',')
         y1,x1,y2,x2,y3,x3,y4,x4,label = split_line[:9]
         
-        sub1 = abs(int(y1) - int(y3))
-        sub2 = abs(int(x1) - int(x3)) 
+#        sub1 = abs(int(y1) - int(y3))
+#        sub2 = abs(int(x1) - int(x3)) 
         
-        if sub1 > sub2:        
-            cnt.append(cv2.rectangle(imgn,(int(y1),int(x1)),(int(y3),int(x3)),(0,200,0),3))
-            cropped.append(val_img[int(x1)-2:int(x3)+2,int(y1)-2:int(y3)+2])
-            cord = [y1,x1,y2,x2,y3,x3,y4,x4]
-        else:
-            cnt.append(cv2.rectangle(imgn,(int(x1),int(y1)),(int(x3),int(y3)),(0,200,0),3))
-            cropped.append(val_img[int(y1)-2:int(y3)+2,int(x1)-2:int(x3)+2]) 
-            cord = [x1,y1,x2,y2,x3,y3,x4,y4]
+#        if sub1 > sub2:        
+        cnt.append(cv2.rectangle(imgn,(int(y1),int(x1)),(int(y3),int(x3)),(0,200,0),3))
+        cropped.append(val_img[int(x1)-2:int(x3)+2,int(y1)-2:int(y3)+2])
+        cord = [y1,x1,y2,x2,y3,x3,y4,x4]
+#        else:
+#            cnt.append(cv2.rectangle(imgn,(int(x1),int(y1)),(int(x3),int(y3)),(0,200,0),3))
+#            cropped.append(val_img[int(y1)-2:int(y3)+2,int(x1)-2:int(x3)+2]) 
+#            cord = [x1,y1,x2,y2,x3,y3,x4,y4]
          
         cordinates.append(",".join(cord))
         label_list.append(label)
@@ -184,6 +204,18 @@ def prevButton():
     else:
         w.after(10,update_image)
 
+def nextImg():
+    global i,j,files
+    i+=1
+    j = 0
+    w.after(10,update_path)
+
+def prevImg():
+    global i,j,files
+    i-=1
+    j = 0
+    w.after(10,update_path)
+    
 def nextCropButton():
     global j,cropped, state
     j+=1
@@ -215,6 +247,19 @@ def resize_img(pil_img):
         return pil_img
     else:
         return pil_img
+    
+def update_path():
+    global i, files, direc, path_new
+    path_new = os.path.join(direc,files[i])
+    
+    w.after(10,update_image_val)
+
+def update_image_val():
+    global path_new,tkimg1, canvas, area
+    pil_img = Image.open(path_new)
+    validImage()
+    tkimg1 = ImageTk.PhotoImage(resize_img(pil_img))
+    canvas.itemconfig(area, image = tkimg1)
     
 def update_image():
     global tkimg1, canvas, area, direc, files, i
